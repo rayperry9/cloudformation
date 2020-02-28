@@ -1,0 +1,35 @@
+---
+Resources:
+  TUDublinEC2ManagementInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: eu-west-1a
+      InstanceType: t2.micro
+      KeyName: TU_Dublin
+      ImageId: ami-02df9ea15c1778c9c
+      SecurityGroups:
+        - !Ref ManagementSecurityGroup
+      UserData:
+        Fn::Base64: |
+           #!/bin/bash
+           sudo apt-get install software-properties-common -y
+           sudo apt-add-repository ppa:ansible/ansible -y
+           sudo apt-get update -y
+           sudo apt-get install ansible -y
+           sudo apt-get install awscli -y
+           wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_386.zip
+           sudo apt-get install unzip -y
+           unzip terraform_0.12.18_linux_386.zip
+           sudo mv terraform /usr/local/bin/
+           sudo rm terraform_0.12.18_linux_386.zip
+           sudo apt install git-all -y
+           
+  ManagementSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow SSH"
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: '22'
+        IpProtocol: tcp
+        ToPort: '22'
